@@ -1,0 +1,37 @@
+# Use a lightweight Linux distribution as the base image
+FROM alpine:3.16
+
+# Install required packages
+RUN apk add --no-cache steghide
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the challenge files to the container
+COPY challenge.zip  /app/
+
+# Build arguments for FLAG and SEED
+ARG FLAG
+ARG SEED
+ARG FLAG_FORMAT
+
+# Update the challenge.zip file with the provided FLAG and SEED
+RUN zip -u challenge.zip flag.txt && \
+    echo "picoCTF\{i\_love\_cyber\_challenges\}" > flag.txt && \
+    zip -u challenge.zip flag.txt && \
+    rm flag.txt
+
+# Build the cylab.jpg file with the updated challenge.zip
+RUN make clean && make main
+
+# Create the artifacts archive
+RUN tar -czf /challenge/artifacts.tar.gz cylab.jpg
+
+# Create the metadata file
+RUN echo '{"flag": "'"${FLAG}"'"}' > /challenge/metadata.json
+
+# Publish the port for the web server 
+#PUBLISH 8000 AS web-server
+
+# Set the entry point to start a simple web server
+CMD ["python3", "-m", "http.server", "8000"]

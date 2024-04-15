@@ -1,0 +1,7 @@
+challenge:
+  name: Open for a surprise
+  author: Oluwole
+  type: docker
+  description: Can you find the hidden treasure within this innocent picture?
+  category: forensics
+  points: 100
